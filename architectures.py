@@ -15,7 +15,7 @@ from datasets import get_normalize_layer
 from torchvision.models.resnet import resnet18, resnet34, resnet50
 from archs.resnet import ResNet50, ResNet18
 #from archs.vrnet import VariationalNetwork
-
+from archs.resnet_cifar import resnet18_backdoored
 import torch
 import torch.backends.cudnn as cudnn
 
@@ -131,6 +131,8 @@ def get_architecture(arch: str, dataset: str, pytorch_pretrained: bool=False) ->
         model = VGG('VGG19').cuda()
     elif arch == "ResNet18":
         model = ResNet18().cuda()
+    elif arch == "ResNet18_backdoored":
+        model = resnet18_backdoored().cuda()
     elif arch == "PreActResNet18":
         model = PreActResNet18().cuda()
     elif arch == "GoogLeNet":
