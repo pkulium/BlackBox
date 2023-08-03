@@ -188,24 +188,25 @@ def main():
         import torch.nn as nn
 
         # Define a, b, c, and d
-        a = torch.rand(724, 28)
-        b = torch.rand(28, 724)
+        a = torch.rand(784, 28)
+        b = torch.rand(28, 784)
         lambda_value = 1e-5  # Set this to your desired value
-        c = a @ b + torch.eye(724) * lambda_value
+        c = a @ b + torch.eye(784) * lambda_value
         d = torch.inverse(c)
 
         # Define the encoder and decoder
-        encoder = nn.Linear(724, 28, bias=False)  # Assuming no bias
+        encoder = nn.Linear(784, 28, bias=False)  # Assuming no bias
         decoder = nn.Sequential(
-            nn.Linear(28, 724, bias=False),  # Assuming no bias
-            nn.Linear(724, 724, bias=False)  # Assuming no bias
+            nn.Linear(28, 784, bias=False),  # Assuming no bias
+            nn.Linear(784, 784, bias=False)  # Assuming no bias
         )
 
         # Set the weights of the encoder and decoder
         with torch.no_grad():
-            encoder.weight.copy_(a)
-            decoder[0].weight.copy_(b)
-            decoder[1].weight.copy_(d)
+            encoder.weight.copy_(a.T)  # Transpose a
+            decoder[0].weight.copy_(b.T)  # Transpose b
+            decoder[1].weight.copy_(d.T)  # Transpose d
+
 
     # c) Classifier / Reconstructor
     checkpoint = torch.load(args.classifier)
