@@ -51,7 +51,7 @@ parser.add_argument('--mu', default=0.005, type=float, metavar='N',
                     help='Smoothing Parameter')
 
 # Model type
-parser.add_argument('--model_type', default='AE_DS', type=str,
+parser.add_argument('--model_type', default='AE_DS_LINEAR', type=str,
                     help="Denoiser + (AutoEncoder) + classifier/reconstructor",
                     choices=['DS', 'AE_DS'])
 parser.add_argument('--arch', default='cifar_dncnn', type=str, choices=DENOISERS_ARCHITECTURES)
@@ -64,7 +64,7 @@ parser.add_argument('--pretrained_denoiser', default='./trained_models/CIFAR-10/
 parser.add_argument('--pretrained_encoder', default='./trained_models/CIFAR-10/AE_DS/AE_DS_FO_lr-3_Adam200SGD600_lr-3_step200/best_encoder.pth.tar', type=str, help='path to a pretrained encoder')
 parser.add_argument('--pretrained_decoder', default='./trained_models/CIFAR-10/AE_DS/AE_DS_FO_lr-3_Adam200SGD600_lr-3_step200/best_decoder.pth.tar', type=str, help='path to a pretrained decoder') 
 # Model to be trained
-parser.add_argument('--train_method', default='whole', type=str,
+parser.add_argument('--train_method', default='part', type=str,
                     help="*part*: only denoiser parameters would be optimized; *whole*: denoiser and encoder parameters would be optimized, *whole_plus*: denoiser and auto-encoder parameters would be optimized",
                     choices=['part', 'whole', 'whole_plus'])
 
@@ -184,6 +184,28 @@ def main():
             decoder.load_state_dict(checkpoint['state_dict'])
         else:
             decoder = get_architecture(args.decoder_arch, args.dataset)
+    elif args.model_type == 'AE_DS_LINEAR':
+        import torch.nn as nn
+
+        # Define a, b, c, and d
+        a = torch.rand(724, 28)
+        b = torch.rand(28, 724)
+        lambda_value = 1e-5  # Set this to your desired value
+        c = a @ b + torch.eye(724) * lambda_value
+        d = torch.inverse(c)
+
+        # Define the encoder and decoder
+        encoder = nn.Linear(724, 28, bias=False)  # Assuming no bias
+        decoder = nn.Sequential(
+            nn.Linear(28, 724, bias=False),  # Assuming no bias
+            nn.Linear(724, 724, bias=False)  # Assuming no bias
+        )
+
+        # Set the weights of the encoder and decoder
+        with torch.no_grad():
+            encoder.weight.copy_(a)
+            decoder[0].weight.copy_(b)
+            decoder[1].weight.copy_(d)
 
     # c) Classifier / Reconstructor
     checkpoint = torch.load(args.classifier)
