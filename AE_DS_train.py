@@ -57,7 +57,7 @@ parser.add_argument('--model_type', default='AE_DS_LINEAR', type=str,
 parser.add_argument('--arch', default='cifar_dncnn', type=str, choices=DENOISERS_ARCHITECTURES)
 parser.add_argument('--encoder_arch', type=str, default='cifar_encoder_192_24', choices=AUTOENCODER_ARCHITECTURES)
 parser.add_argument('--decoder_arch', type=str, default='cifar_decoder_192_24', choices=AUTOENCODER_ARCHITECTURES)
-parser.add_argument('--classifier', default='./trained_models/CIFAR-10/Classifiers/model_39.th', type=str,
+parser.add_argument('--classifier', default='./trained_models/CIFAR-10/Classifiers/resnet110.pth.tar', type=str,
                     help='path to the classifier used with the `classificaiton`'
                          'or `stability` objectives of the denoiser.')
 parser.add_argument('--pretrained_denoiser', default='./trained_models/CIFAR-10/AE_DS/AE_DS_FO_lr-3_Adam200SGD600_lr-3_step200/best_denoiser.pth.tar', type=str, help='path to a pretrained denoiser')
